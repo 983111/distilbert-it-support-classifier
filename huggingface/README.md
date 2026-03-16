@@ -167,7 +167,7 @@ The domain (IT support routing) is deliberately practical: every company with an
 ## Training Code
 
 Full training code and dataset generation scripts are available at:
-[github.com/your-username/distilbert-it-support-classifier](https://github.com/your-username/distilbert-it-support-classifier)
+[github.com/your-username/distilbert-it-support-classifier](https://github.com/983111/distilbert-it-support-classifier)
 
 ## Citation
 
