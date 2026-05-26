@@ -1,0 +1,31 @@
+# Python cache and artifacts
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.build/
+build/
+dist/
+
+# Virtual environments and env files
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Training artifacts
+outputs/
+runs/
+checkpoints/
+*.pt
+*.bin
+*.safetensors
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/

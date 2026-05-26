@@ -1,12 +1,11 @@
 """
-inference.py
-────────────
 Load the fine-tuned model (local or from Hub) and classify new tickets.
 
 Usage:
-  python inference.py                         # demo with built-in examples
-  python inference.py --model_path outputs/distilbert-it-support
-  python inference.py --hub your-username/distilbert-it-support-classifier
+  python src/inference.py
+  python src/inference.py --model_path outputs/distilbert-it-support
+  python src/inference.py --hub your-username/distilbert-it-support-classifier
+  python src/inference.py --low_confidence_threshold 0.75
 """
 
 import argparse
@@ -25,35 +24,35 @@ DEMO_TEXTS = [
 ]
 
 
-def classify(texts: list[str], model_path: str) -> None:
+def classify(texts: list[str], model_path: str, low_confidence_threshold: float = 0.70) -> None:
     print(f"\nLoading model from: {model_path}\n")
-    clf = pipeline(
-        "text-classification",
-        model=model_path,
-        device=-1,  # CPU; set to 0 for GPU
-    )
+    clf = pipeline("text-classification", model=model_path, device=-1)
 
-    print(f"{'─'*65}")
-    print(f"{'TICKET TEXT':<45} {'LABEL':<12} {'SCORE':>6}")
-    print(f"{'─'*65}")
+    print("-" * 100)
+    print(f"{'TICKET TEXT':<45} {'LABEL':<12} {'CONF':>8} {'DECISION':<25}")
+    print("-" * 100)
 
     results = clf(texts, truncation=True, max_length=128)
     for text, result in zip(texts, results):
         label = result["label"]
-        score = result["score"]
+        score = float(result["score"])
         display_text = (text[:42] + "...") if len(text) > 45 else text
-        print(f"{display_text:<45} {label:<12} {score:>5.1%}")
 
-    print(f"{'─'*65}\n")
+        decision = "AUTO_CLASSIFY" if score >= low_confidence_threshold else "REVIEW_REQUIRED"
+        print(f"{display_text:<45} {label:<12} {score:>7.1%}  {decision:<25}")
+
+    print("-" * 100 + "\n")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Run IT ticket inference with confidence guardrails")
     parser.add_argument("--model_path", type=str, default="outputs/distilbert-it-support",
                         help="Local path to saved model directory")
     parser.add_argument("--hub", type=str, default=None,
                         help="HuggingFace Hub model ID (overrides --model_path)")
+    parser.add_argument("--low_confidence_threshold", type=float, default=0.70,
+                        help="Flag predictions below this threshold for human review")
     args = parser.parse_args()
 
     model_source = args.hub if args.hub else args.model_path
-    classify(DEMO_TEXTS, model_source)
+    classify(DEMO_TEXTS, model_source, low_confidence_threshold=args.low_confidence_threshold)
