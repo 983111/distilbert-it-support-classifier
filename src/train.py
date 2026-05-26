@@ -1,6 +1,6 @@
 """
 train.py
-────────
+--------
 Fine-tunes DistilBERT on the IT Support Ticket dataset using the
 HuggingFace Trainer API, evaluates on a held-out test split, and
 optionally pushes the final model + tokenizer to HuggingFace Hub.
@@ -21,7 +21,7 @@ import random
 import numpy as np
 from pathlib import Path
 
-# ── HuggingFace imports ──────────────────────────────────────────────────────
+# -- HuggingFace imports ------------------------------------------------------
 from datasets import Dataset, DatasetDict, ClassLabel, Features, Value
 from transformers import (
     AutoTokenizer,
@@ -34,7 +34,7 @@ from transformers import (
 import torch
 from sklearn.metrics import accuracy_score, f1_score, classification_report
 
-# ── Config ───────────────────────────────────────────────────────────────────
+# -- Config -------------------------------------------------------------------
 MODEL_CHECKPOINT = "distilbert-base-uncased"
 NUM_LABELS = 5
 LABEL_NAMES = ["billing", "hardware", "network", "account", "software"]
@@ -47,7 +47,7 @@ np.random.seed(SEED)
 torch.manual_seed(SEED)
 
 
-# ── Helpers ──────────────────────────────────────────────────────────────────
+# -- Helpers ------------------------------------------------------------------
 
 def load_csv_dataset(path: str) -> DatasetDict:
     """Load CSV, split 80/10/10 into train/val/test."""
@@ -98,7 +98,7 @@ def compute_metrics(eval_pred):
     }
 
 
-# ── Main ─────────────────────────────────────────────────────────────────────
+# -- Main ---------------------------------------------------------------------
 
 def main(args):
     print(f"\n{'='*60}")
@@ -106,20 +106,20 @@ def main(args):
     print(f"{'='*60}\n")
 
     # 1. Load & tokenize data
-    print("▶ Loading dataset …")
+    print("- Loading dataset ...")
     raw_datasets = load_csv_dataset(DATA_PATH)
     print(f"  Train: {len(raw_datasets['train'])} | "
           f"Val: {len(raw_datasets['validation'])} | "
           f"Test: {len(raw_datasets['test'])}")
 
-    print("▶ Loading tokenizer …")
+    print("- Loading tokenizer ...")
     tokenizer = AutoTokenizer.from_pretrained(MODEL_CHECKPOINT)
 
-    print("▶ Tokenizing …")
+    print("- Tokenizing ...")
     tokenized = tokenize_dataset(raw_datasets, tokenizer)
 
     # 2. Load model
-    print("▶ Loading model …")
+    print("- Loading model ...")
     model = AutoModelForSequenceClassification.from_pretrained(
         MODEL_CHECKPOINT,
         num_labels=NUM_LABELS,
@@ -165,11 +165,11 @@ def main(args):
     )
 
     # 5. Train
-    print("\n▶ Training …")
+    print("\n- Training ...")
     trainer.train()
 
     # 6. Evaluate on held-out test set
-    print("\n▶ Evaluating on test set …")
+    print("\n- Evaluating on test set ...")
     test_preds_output = trainer.predict(tokenized["test"])
     test_preds = np.argmax(test_preds_output.predictions, axis=-1)
     test_labels = test_preds_output.label_ids
@@ -192,9 +192,9 @@ def main(args):
 
     # 7. Push to Hub
     if args.push_to_hub:
-        print(f"\n▶ Pushing model to HuggingFace Hub → {args.hub_model_id} …")
+        print(f"\n- Pushing model to HuggingFace Hub → {args.hub_model_id} ...")
         trainer.push_to_hub(commit_message="Fine-tuned DistilBERT for IT support ticket classification")
-        print("  Done! 🎉")
+        print("  Done! Done")
 
     print(f"\n{'='*60}")
     print(f"  Training complete.")

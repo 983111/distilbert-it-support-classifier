@@ -2,7 +2,7 @@
 
 Fine-tuned `distilbert-base-uncased` on a custom 300-row IT support ticket dataset for 5-class text classification, achieving **86.67% test accuracy**. Trained using the HuggingFace Trainer API and published to the HuggingFace Hub.
 
-🤗 **Model on Hub:** [vishwajeet456/distilbert-it-support-classifier](https://huggingface.co/vishwajeet456/distilbert-it-support-classifier)
+**Model on Hub:** [vishwajeet456/distilbert-it-support-classifier](https://huggingface.co/vishwajeet456/distilbert-it-support-classifier)
 
 ---
 
@@ -82,12 +82,12 @@ TrainingArguments(
 ├── src/
 │   ├── create_dataset.py        # generates data/support_tickets.csv (300 rows)
 │   ├── train.py                 # HuggingFace Trainer fine-tuning pipeline
-│   └── inference.py             # pipeline-based inference demo
+│   ├── inference.py             # inference with confidence-based review flag
+│   └── evaluate.py              # held-out metrics: precision, recall, F1
 ├── data/
 │   └── support_tickets.csv      # auto-created by create_dataset.py
 ├── DistilBERT_IT_Support_Classifier.ipynb   # self-contained Colab notebook
-├── README.md                    # HuggingFace model card
-├── GITHUB_README.md             # this file
+├── README.md                    # project documentation
 └── requirements.txt
 ```
 
@@ -108,6 +108,10 @@ python src/train.py
 
 # Train + push to Hub
 python src/train.py --push_to_hub --hub_model_id vishwajeet456/distilbert-it-support-classifier
+
+# Evaluate on held-out test split
+python src/evaluate.py
+
 ```
 
 ---
@@ -159,4 +163,4 @@ numpy>=1.26.0
 
 ## License
 
-Apache 2.0
+MIT
